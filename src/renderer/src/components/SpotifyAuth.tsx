@@ -87,9 +87,9 @@ export const SpotifyAuth: React.FC<SpotifyAuthProps> = ({
               <p className="text-[11px] text-gray-400">
                 {status.isConnected
                   ? status.hasActiveDevice
-                    ? 'Player active on device • Ready to control'
-                    : 'Connected, but no active playback detected (open Spotify app)'
-                  : 'Connect your Spotify account to enable auto play/pause'}
+                    ? 'Spotify running on PC • Ready to toggle with F8'
+                    : 'Connected • Open the Spotify desktop app on your PC to enable control'
+                  : 'Connect your Spotify account or launch Spotify desktop to enable auto play/pause'}
               </p>
             </div>
           </div>

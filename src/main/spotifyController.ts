@@ -26,6 +26,7 @@ export class SpotifyController {
   private localServer: http.Server | null = null
   private currentVerifier: string | null = null
   private onAuthCallback?: (status: SpotifyAuthStatus) => void
+  private webApiBlocked: boolean = false
 
   constructor() {}
 
@@ -54,6 +55,7 @@ export class SpotifyController {
       store.updateSettings({ spotifyClientId: clientId })
     }
 
+    this.webApiBlocked = false
     this.currentVerifier = this.generateCodeVerifier()
     const challenge = this.generateCodeChallenge(this.currentVerifier)
 
@@ -322,8 +324,18 @@ export class SpotifyController {
     if (!token) {
       return {
         isConnected: isSpotifyRunning,
-        displayName: isSpotifyRunning ? 'Spotify Desktop (Local Mode)' : null,
-        product: isSpotifyRunning ? 'Local App' : null,
+        displayName: isSpotifyRunning ? 'Spotify Desktop' : null,
+        product: isSpotifyRunning ? 'Desktop Mode' : null,
+        hasActiveDevice: isSpotifyRunning
+      }
+    }
+
+    // If Spotify Web API previously returned 403 (Free account policy restriction)
+    if (this.webApiBlocked) {
+      return {
+        isConnected: true,
+        displayName: 'Spotify (Desktop Mode)',
+        product: 'Free / Desktop',
         hasActiveDevice: isSpotifyRunning
       }
     }
@@ -354,20 +366,21 @@ export class SpotifyController {
         }
       }
 
-      // If token exists but Spotify API returned 403 (e.g. Free account restricted by Spotify's new policy)
-      const errText = await userRes.text()
-      console.log('Spotify profile returned:', userRes.status, errText)
+      // If Spotify API returned 403 (Free account restricted by Spotify's Web API policy)
+      if (userRes.status === 403) {
+        this.webApiBlocked = true
+      }
 
       return {
         isConnected: true,
-        displayName: 'Spotify Account (Desktop Fallback)',
+        displayName: 'Spotify (Desktop Mode)',
         product: 'Free / Desktop',
         hasActiveDevice: isSpotifyRunning
       }
     } catch {
       return {
         isConnected: true,
-        displayName: 'Spotify Account',
+        displayName: 'Spotify (Desktop Mode)',
         product: 'Desktop Mode',
         hasActiveDevice: isSpotifyRunning
       }
@@ -375,6 +388,7 @@ export class SpotifyController {
   }
 
   public disconnect(): void {
+    this.webApiBlocked = false
     store.updateSettings({
       spotifyAccessToken: null,
       spotifyRefreshToken: null,
