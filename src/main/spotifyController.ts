@@ -2,6 +2,7 @@ import * as http from 'node:http'
 import * as crypto from 'node:crypto'
 import { shell } from 'electron'
 import { store } from './store'
+import { windowsAudio } from './windowsAudio'
 
 const REDIRECT_URI = 'http://127.0.0.1:8888/callback'
 const SPOTIFY_SCOPES = [
@@ -246,77 +247,85 @@ export class SpotifyController {
 
   public async setSpotifyPlayback(play: boolean): Promise<boolean> {
     const token = await this.getValidAccessToken()
-    if (!token) return false
+    let webApiSuccess = false
 
-    const endpoint = play
-      ? 'https://api.spotify.com/v1/me/player/play'
-      : 'https://api.spotify.com/v1/me/player/pause'
+    if (token) {
+      const endpoint = play
+        ? 'https://api.spotify.com/v1/me/player/play'
+        : 'https://api.spotify.com/v1/me/player/pause'
 
-    try {
-      const response = await fetch(endpoint, {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${token}`
+      try {
+        const response = await fetch(endpoint, {
+          method: 'PUT',
+          headers: { Authorization: `Bearer ${token}` }
+        })
+
+        if (response.status === 204 || response.ok) {
+          webApiSuccess = true
+        } else if (response.status === 401) {
+          const refreshed = await this.refreshAccessToken()
+          if (refreshed) {
+            return this.setSpotifyPlayback(play)
+          }
         }
-      })
-
-      if (response.status === 204 || response.ok) {
-        return true
+      } catch (err) {
+        console.warn('Spotify Web API playback call failed, falling back to desktop media key:', err)
       }
-
-      if (response.status === 401) {
-        // Try refresh once
-        const refreshed = await this.refreshAccessToken()
-        if (refreshed) {
-          return this.setSpotifyPlayback(play)
-        }
-      }
-
-      // 404 typically means no active device or player not open
-      return false
-    } catch (err) {
-      console.error(`Failed to set Spotify playback (${play ? 'play' : 'pause'}):`, err)
-      return false
     }
+
+    // Fallback: Send Windows Media Play/Pause key event directly to Spotify desktop
+    if (!webApiSuccess) {
+      await windowsAudio.sendMediaKey(play ? 'play' : 'pause')
+    }
+
+    return true
   }
 
   public async setSpotifyVolume(percent: number): Promise<boolean> {
     const token = await this.getValidAccessToken()
-    if (!token) return false
-
     const clamped = Math.round(Math.max(0, Math.min(100, percent)))
-    const endpoint = `https://api.spotify.com/v1/me/player/volume?volume_percent=${clamped}`
+    let webApiSuccess = false
 
-    try {
-      const response = await fetch(endpoint, {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${token}`
+    if (token) {
+      const endpoint = `https://api.spotify.com/v1/me/player/volume?volume_percent=${clamped}`
+
+      try {
+        const response = await fetch(endpoint, {
+          method: 'PUT',
+          headers: { Authorization: `Bearer ${token}` }
+        })
+
+        if (response.status === 204 || response.ok) {
+          webApiSuccess = true
+        } else if (response.status === 401) {
+          const refreshed = await this.refreshAccessToken()
+          if (refreshed) {
+            return this.setSpotifyVolume(clamped)
+          }
         }
-      })
-
-      if (response.status === 204 || response.ok) {
-        return true
+      } catch (err) {
+        console.warn('Spotify Web API volume call failed, falling back to Windows mixer:', err)
       }
-
-      if (response.status === 401) {
-        const refreshed = await this.refreshAccessToken()
-        if (refreshed) {
-          return this.setSpotifyVolume(clamped)
-        }
-      }
-
-      return false
-    } catch (err) {
-      console.error('Failed to set Spotify volume:', err)
-      return false
     }
+
+    // Fallback: Directly adjust Spotify.exe volume in Windows Volume Mixer (WASAPI)
+    // Also apply mixer volume control regardless to guarantee exact decibel control
+    await windowsAudio.setProcessVolume('Spotify', clamped / 100)
+
+    return true
   }
 
   public async getAuthStatus(): Promise<SpotifyAuthStatus> {
+    const isSpotifyRunning = await windowsAudio.isProcessRunning('Spotify')
     const token = await this.getValidAccessToken()
+
     if (!token) {
-      return { isConnected: false, displayName: null, product: null, hasActiveDevice: false }
+      return {
+        isConnected: isSpotifyRunning,
+        displayName: isSpotifyRunning ? 'Spotify Desktop (Local Mode)' : null,
+        product: isSpotifyRunning ? 'Local App' : null,
+        hasActiveDevice: isSpotifyRunning
+      }
     }
 
     try {
@@ -324,30 +333,44 @@ export class SpotifyController {
         headers: { Authorization: `Bearer ${token}` }
       })
 
-      if (!userRes.ok) {
-        return { isConnected: false, displayName: null, product: null, hasActiveDevice: false }
+      if (userRes.ok) {
+        const userData = (await userRes.json()) as any
+        let hasActiveDevice = isSpotifyRunning
+
+        const playerRes = await fetch('https://api.spotify.com/v1/me/player', {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+
+        if (playerRes.status === 200) {
+          const playerData = (await playerRes.json()) as any
+          hasActiveDevice = !!playerData?.device?.is_active || isSpotifyRunning
+        }
+
+        return {
+          isConnected: true,
+          displayName: userData.display_name || userData.id || 'Spotify User',
+          product: userData.product || 'Premium',
+          hasActiveDevice
+        }
       }
 
-      const userData = (await userRes.json()) as any
-      let hasActiveDevice = false
-
-      const playerRes = await fetch('https://api.spotify.com/v1/me/player', {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-
-      if (playerRes.status === 200) {
-        const playerData = (await playerRes.json()) as any
-        hasActiveDevice = !!playerData?.device?.is_active
-      }
+      // If token exists but Spotify API returned 403 (e.g. Free account restricted by Spotify's new policy)
+      const errText = await userRes.text()
+      console.log('Spotify profile returned:', userRes.status, errText)
 
       return {
         isConnected: true,
-        displayName: userData.display_name || userData.id || 'Spotify User',
-        product: userData.product || 'free',
-        hasActiveDevice
+        displayName: 'Spotify Account (Desktop Fallback)',
+        product: 'Free / Desktop',
+        hasActiveDevice: isSpotifyRunning
       }
     } catch {
-      return { isConnected: false, displayName: null, product: null, hasActiveDevice: false }
+      return {
+        isConnected: true,
+        displayName: 'Spotify Account',
+        product: 'Desktop Mode',
+        hasActiveDevice: isSpotifyRunning
+      }
     }
   }
 

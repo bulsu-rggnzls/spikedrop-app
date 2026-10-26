@@ -40,6 +40,24 @@ export class WindowsAudioController {
   }
 
   /**
+   * Send Windows Media Key event (play/pause/stop/next/prev)
+   */
+  async sendMediaKey(action: 'play' | 'pause' | 'stop' | 'next' | 'prev' = 'play'): Promise<boolean> {
+    if (this.helperPath && fs.existsSync(this.helperPath)) {
+      try {
+        await execFileAsync(this.helperPath, ['media', action], {
+          windowsHide: true,
+          timeout: 2000
+        })
+        return true
+      } catch {
+        // ignore
+      }
+    }
+    return false
+  }
+
+  /**
    * Set process volume (volume between 0.0 and 1.0)
    */
   async setProcessVolume(processName: string, volume: number): Promise<boolean> {

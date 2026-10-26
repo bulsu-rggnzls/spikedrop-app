@@ -90,9 +90,40 @@ namespace SpikeDropAudio {
     }
 
     public class Program {
+        [DllImport("user32.dll")]
+        public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
+
+        const byte VK_MEDIA_NEXT_TRACK = 0xB0;
+        const byte VK_MEDIA_PREV_TRACK = 0xB1;
+        const byte VK_MEDIA_STOP = 0xB2;
+        const byte VK_MEDIA_PLAY_PAUSE = 0xB3;
+        const uint KEYEVENTF_KEYUP = 0x0002;
+
         public static int Main(string[] args) {
             try {
                 string command = args.Length > 0 ? args[0].ToLowerInvariant() : "list";
+
+                // Fast media key command: audioController.exe media <play|pause|stop|next|prev>
+                if (command == "media") {
+                    string action = args.Length > 1 ? args[1].ToLowerInvariant() : "play";
+                    if (action == "stop") {
+                        keybd_event(VK_MEDIA_STOP, 0, 0, UIntPtr.Zero);
+                        keybd_event(VK_MEDIA_STOP, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
+                    } else if (action == "next") {
+                        keybd_event(VK_MEDIA_NEXT_TRACK, 0, 0, UIntPtr.Zero);
+                        keybd_event(VK_MEDIA_NEXT_TRACK, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
+                    } else if (action == "prev") {
+                        keybd_event(VK_MEDIA_PREV_TRACK, 0, 0, UIntPtr.Zero);
+                        keybd_event(VK_MEDIA_PREV_TRACK, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
+                    } else {
+                        // play / pause / toggle
+                        keybd_event(VK_MEDIA_PLAY_PAUSE, 0, 0, UIntPtr.Zero);
+                        keybd_event(VK_MEDIA_PLAY_PAUSE, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
+                    }
+                    Console.WriteLine("OK");
+                    return 0;
+                }
+
                 var enumerator = (IMMDeviceEnumerator)(new MMDeviceEnumeratorComObject());
                 IMMDevice dev = null;
                 enumerator.GetDefaultAudioEndpoint(EDataFlow.eRender, ERole.eMultimedia, out dev);
@@ -204,4 +235,3 @@ namespace SpikeDropAudio {
         }
     }
 }
-
