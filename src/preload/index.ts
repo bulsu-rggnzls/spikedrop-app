@@ -40,6 +40,7 @@ export interface ValorantStatus {
 export type AudioMode = 'GAMING' | 'CHILL'
 
 const api = {
+  isElectron: true,
   getSettings: (): Promise<AppSettings> => ipcRenderer.invoke('get-settings'),
   updateSettings: (updates: Partial<AppSettings>): Promise<AppSettings> =>
     ipcRenderer.invoke('update-settings', updates),

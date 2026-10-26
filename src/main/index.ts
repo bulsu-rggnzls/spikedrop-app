@@ -31,6 +31,7 @@ function createWindow(): BrowserWindow {
   const iconPath = getIconPath()
 
   mainWindow = new BrowserWindow({
+    title: 'SpikeDrop - Valorant & Spotify Global Audio Switcher',
     width: 860,
     height: 720,
     minWidth: 700,
@@ -51,7 +52,16 @@ function createWindow(): BrowserWindow {
 
   mainWindow.on('ready-to-show', () => {
     mainWindow?.show()
+    mainWindow?.focus()
   })
+
+  // Fallback to guarantee window shows up if ready-to-show is delayed by dev server
+  setTimeout(() => {
+    if (mainWindow && !mainWindow.isDestroyed() && !mainWindow.isVisible()) {
+      mainWindow.show()
+      mainWindow.focus()
+    }
+  }, 1500)
 
   mainWindow.on('close', (event) => {
     const settings = store.getSettings()
@@ -217,35 +227,50 @@ function registerIpcHandlers(): void {
   })
 }
 
-// App lifecycle
-app.whenReady().then(() => {
-  registerIpcHandlers()
-  createWindow()
-  createTray()
-  shortcutManager.register()
+// Single Instance Lock
+const gotTheLock = app.requestSingleInstanceLock()
 
-  spotifyController.setAuthCallback((status) => {
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send('spotify-status-changed', status)
+if (!gotTheLock) {
+  app.quit()
+} else {
+  app.on('second-instance', () => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore()
+      mainWindow.show()
+      mainWindow.focus()
     }
   })
 
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow()
+  // App lifecycle
+  app.whenReady().then(() => {
+    registerIpcHandlers()
+    createWindow()
+    createTray()
+    shortcutManager.register()
+
+    spotifyController.setAuthCallback((status) => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('spotify-status-changed', status)
+      }
+    })
+
+    app.on('activate', () => {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        createWindow()
+      }
+    })
+  })
+
+  app.on('will-quit', () => {
+    shortcutManager.unregisterAll()
+  })
+
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+      const settings = store.getSettings()
+      if (!settings.minimizeToTray) {
+        app.quit()
+      }
     }
   })
-})
-
-app.on('will-quit', () => {
-  shortcutManager.unregisterAll()
-})
-
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    const settings = store.getSettings()
-    if (!settings.minimizeToTray) {
-      app.quit()
-    }
-  }
-})
+}

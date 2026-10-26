@@ -6,7 +6,7 @@ import { HotkeyConfig } from './components/HotkeyConfig'
 import { SpotifyAuth } from './components/SpotifyAuth'
 import { ProcessStatus } from './components/ProcessStatus'
 import { AppSettings, AudioMode, ValorantStatus, SpotifyAuthStatus, AudioSessionInfo } from './types'
-import { ShieldCheck, Info } from 'lucide-react'
+import { ShieldCheck, Info, AlertTriangle } from 'lucide-react'
 
 export const App: React.FC = () => {
   const [settings, setSettings] = useState<AppSettings | null>(null)
@@ -124,6 +124,21 @@ export const App: React.FC = () => {
       <TitleBar />
 
       <main className="flex-1 overflow-y-auto p-4 space-y-4">
+        {window.api?.isElectron === false && (
+          <div className="bg-amber-500/10 border border-amber-500/40 rounded-xl p-3 flex items-start gap-3 text-amber-300 text-xs shadow-lg">
+            <AlertTriangle className="w-5 h-5 flex-shrink-0 text-amber-400 mt-0.5" />
+            <div>
+              <div className="font-bold text-amber-200">You are viewing SpikeDrop inside a Web Browser / VS Code Preview</div>
+              <p className="text-gray-300 mt-1 leading-relaxed">
+                SpikeDrop is a <strong>Windows desktop application</strong>. Operating system features (Valorant Windows mixer control, global fullscreen <kbd className="px-1.5 py-0.5 bg-[#1b2733] border border-gray-700 rounded text-gray-200 font-mono font-bold">F8</kbd> hotkey, and Spotify integration) run in the <strong>standalone SpikeDrop desktop window</strong>.
+              </p>
+              <p className="text-amber-400 font-semibold mt-1">
+                👉 Switch to the SpikeDrop window on your Windows Taskbar or system tray!
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Active Mode Visual Indicator */}
         <ModeIndicator
           mode={mode}

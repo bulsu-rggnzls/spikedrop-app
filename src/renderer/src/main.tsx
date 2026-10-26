@@ -25,6 +25,7 @@ if (typeof window !== 'undefined' && !window.api) {
   const modeListeners: Array<(m: 'GAMING' | 'CHILL') => void> = []
 
   ;(window as any).api = {
+    isElectron: false,
     getSettings: async () => ({ ...mockSettings }),
     updateSettings: async (updates: any) => {
       mockSettings = { ...mockSettings, ...updates }
