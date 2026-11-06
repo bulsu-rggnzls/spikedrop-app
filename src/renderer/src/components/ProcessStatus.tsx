@@ -12,19 +12,20 @@ export const ProcessStatus: React.FC<ProcessStatusProps> = ({ status, sessions, 
   const [showSessions, setShowSessions] = useState(false)
 
   return (
-    <div className="bg-[#131d27] border border-[#1f2e3d] rounded-xl p-4">
+    <div className="bg-theme-surface border border-theme-border-default rounded-xl p-4">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <Activity className="w-4 h-4 text-valorant-red" />
-          <h3 className="text-sm font-bold text-white tracking-wide uppercase">
+          <Activity className="w-4 h-4 text-theme-primary" />
+          <h3 className="text-base font-bold text-white tracking-wide uppercase">
             Game Detection Status
           </h3>
         </div>
 
         <button
+          type="button"
           onClick={onRefresh}
           title="Refresh process status"
-          className="text-gray-400 hover:text-white transition-colors"
+          className="text-theme-text-muted hover:text-white transition-colors"
         >
           <RefreshCw className="w-3.5 h-3.5" />
         </button>
@@ -32,13 +33,13 @@ export const ProcessStatus: React.FC<ProcessStatusProps> = ({ status, sessions, 
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {/* Valorant Process Badge */}
-        <div className="bg-[#0e161e] p-3 rounded-lg border border-[#1a2835] flex items-center justify-between">
+        <div className="bg-theme-inset p-3 rounded-lg border border-theme-border-default flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div
-              className={`w-9 h-9 rounded-lg flex items-center justify-center ${
+              className={`w-[var(--size-badge-md)] h-[var(--size-badge-md)] rounded-lg flex items-center justify-center ${
                 status.isRunning
-                  ? 'bg-valorant-red/20 text-valorant-red'
-                  : 'bg-gray-800 text-gray-500'
+                  ? 'bg-theme-primary/20 text-theme-primary'
+                  : 'bg-theme-surface-elevated text-theme-text-dim'
               }`}
             >
               {status.isRunning ? (
@@ -49,10 +50,10 @@ export const ProcessStatus: React.FC<ProcessStatusProps> = ({ status, sessions, 
             </div>
 
             <div>
-              <div className="text-xs font-semibold text-white">
+              <div className="text-sm font-semibold text-white">
                 {status.isRunning ? 'VALORANT Running' : 'VALORANT Not Found'}
               </div>
-              <div className="text-[11px] text-gray-400 font-mono">
+              <div className="text-xs text-theme-text-muted font-mono">
                 VALORANT-Win64-Shipping
               </div>
             </div>
@@ -60,29 +61,29 @@ export const ProcessStatus: React.FC<ProcessStatusProps> = ({ status, sessions, 
 
           <span
             className={`w-2.5 h-2.5 rounded-full ${
-              status.isRunning ? 'bg-spotify-green animate-ping' : 'bg-gray-600'
+              status.isRunning ? 'bg-theme-success animate-ping' : 'bg-theme-border-focus'
             }`}
           />
         </div>
 
         {/* Windows Audio Session Badge */}
-        <div className="bg-[#0e161e] p-3 rounded-lg border border-[#1a2835] flex items-center justify-between">
+        <div className="bg-theme-inset p-3 rounded-lg border border-theme-border-default flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div
-              className={`w-9 h-9 rounded-lg flex items-center justify-center ${
+              className={`w-[var(--size-badge-md)] h-[var(--size-badge-md)] rounded-lg flex items-center justify-center ${
                 status.hasAudioSession
-                  ? 'bg-spotify-green/20 text-spotify-green'
-                  : 'bg-gray-800 text-gray-500'
+                  ? 'bg-theme-success/20 text-theme-success'
+                  : 'bg-theme-surface-elevated text-theme-text-dim'
               }`}
             >
               <Volume2 className="w-5 h-5" />
             </div>
 
             <div>
-              <div className="text-xs font-semibold text-white">
+              <div className="text-sm font-semibold text-white">
                 {status.hasAudioSession ? 'Audio Session Hooked' : 'Waiting for Audio'}
               </div>
-              <div className="text-[11px] text-gray-400">
+              <div className="text-xs text-theme-text-muted">
                 {status.currentVolume !== null
                   ? `Live Mixer Volume: ${status.currentVolume}%`
                   : 'No active sound stream'}
@@ -91,8 +92,9 @@ export const ProcessStatus: React.FC<ProcessStatusProps> = ({ status, sessions, 
           </div>
 
           <button
+            type="button"
             onClick={() => setShowSessions(!showSessions)}
-            className="text-[10px] text-gray-400 hover:text-white underline font-mono"
+            className="text-2xs text-theme-text-muted hover:text-white underline font-mono"
           >
             {showSessions ? 'Hide' : 'Sessions'}
           </button>
@@ -100,18 +102,18 @@ export const ProcessStatus: React.FC<ProcessStatusProps> = ({ status, sessions, 
       </div>
 
       {showSessions && (
-        <div className="mt-3 p-2 bg-[#0a1016] rounded border border-[#1a2835] text-[11px] font-mono max-h-36 overflow-y-auto">
-          <div className="text-gray-400 mb-1 font-bold">Active Windows Audio Sessions:</div>
+        <div className="mt-3 p-2 bg-theme-inset-subtle rounded border border-theme-border-default text-xs font-mono max-h-36 overflow-y-auto">
+          <div className="text-theme-text-muted mb-1 font-bold">Active Windows Audio Sessions:</div>
           {sessions.length === 0 ? (
-            <div className="text-gray-500">No active audio streams detected.</div>
+            <div className="text-theme-text-dim">No active audio streams detected.</div>
           ) : (
             <div className="space-y-1">
               {sessions.map((s, idx) => (
-                <div key={idx} className="flex justify-between items-center text-gray-300">
-                  <span className="truncate max-w-[200px]">
+                <div key={idx} className="flex justify-between items-center text-theme-text-body">
+                  <span className="truncate max-w-[12.5rem]">
                     {s.processName || `PID ${s.pid}`}
                   </span>
-                  <span className="text-gray-400">
+                  <span className="text-theme-text-muted">
                     {Math.round(s.volume * 100)}% {s.isMuted ? '(Muted)' : ''}
                   </span>
                 </div>
@@ -123,4 +125,3 @@ export const ProcessStatus: React.FC<ProcessStatusProps> = ({ status, sessions, 
     </div>
   )
 }
-
