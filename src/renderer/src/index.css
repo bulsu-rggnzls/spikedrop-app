@@ -2,13 +2,165 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  body {
-    user-select: none;
-    -webkit-user-select: none;
-    overflow-x: hidden;
-  }
+/* ==========================================================================
+   Design Tokens & System Setup
+   ========================================================================== */
+
+:root {
+  /* Primitive Palette: Modern OKLCH (with RGB fallbacks for legacy consumers) */
+  --color-primitive-valorant-red: oklch(0.62 0.23 23.5);        /* #ff4655 */
+  --color-primitive-valorant-red-rgb: 255, 70, 85;
+  --color-primitive-spotify-green: oklch(0.72 0.19 146.4);      /* #1db954 */
+  --color-primitive-spotify-green-rgb: 29, 185, 84;
+  --color-primitive-spotify-hover: oklch(0.76 0.20 146.4);      /* #1ed760 */
+  --color-primitive-white: oklch(1 0 0);
+  --color-primitive-black: oklch(0 0 0);
+
+  /* Semantic Theme: Dark Mode (Native Gaming Palette) */
+  --color-bg-base: oklch(0.18 0.02 245);             /* #0f1923: App Canvas */
+  --color-bg-header: oklch(0.15 0.02 245);           /* #0b1219: Frameless titlebar */
+  --color-bg-surface: oklch(0.20 0.02 240);          /* #131d27: Primary cards */
+  --color-bg-surface-elevated: oklch(0.24 0.02 235); /* #1b2733: Raised elements / buttons */
+  --color-bg-surface-hover: oklch(0.28 0.02 235);    /* #253648: Button hover */
+  --color-bg-inset: oklch(0.16 0.02 245);            /* #0e161e: Wells / Inset rows */
+  --color-bg-inset-subtle: oklch(0.14 0.02 245);     /* #0a1016: Deep code / session view */
+
+  /* Mode Gradients (Live Gaming vs Chill HUD) */
+  --color-gradient-gaming-from: oklch(0.19 0.02 280); /* #181a24 */
+  --color-gradient-gaming-to: oklch(0.17 0.03 340);   /* #1e131d */
+  --color-gradient-chill-from: oklch(0.19 0.03 160);  /* #101e19 */
+  --color-gradient-chill-to: oklch(0.19 0.02 230);    /* #121c24 */
+
+  /* Semantic Borders */
+  --color-border-subtle: oklch(0.25 0.02 235);       /* #1b2733 */
+  --color-border-default: oklch(0.27 0.02 230);      /* #1f2e3d / #1a2835 */
+  --color-border-focus: oklch(0.33 0.02 230);        /* #2c3e50 / #2a3d52 */
+
+  /* Semantic Typography */
+  --color-text-main: oklch(0.93 0.01 90);            /* #ece8e1: Primary headings/labels */
+  --color-text-body: oklch(0.85 0.01 240);           /* Neutral text */
+  --color-text-muted: oklch(0.68 0.01 240);          /* Secondary labels / subtext */
+  --color-text-dim: oklch(0.50 0.01 240);            /* Tertiary / timestamps / hints */
+
+  /* Accent & Action */
+  --color-primary: var(--color-primitive-valorant-red);
+  --color-primary-rgb: var(--color-primitive-valorant-red-rgb);
+  --color-success: var(--color-primitive-spotify-green);
+  --color-success-rgb: var(--color-primitive-spotify-green-rgb);
+  --color-success-hover: var(--color-primitive-spotify-hover);
+  --color-warning: oklch(0.79 0.16 80);              /* Amber-400 */
+  --color-danger: oklch(0.55 0.22 25);               /* Error red */
+
+  /* Typography Scale */
+  --font-family-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-mono: 'Consolas', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+
+  --text-2xs: 0.625rem;    /* 10px */
+  --text-xs: 0.6875rem;    /* 11px */
+  --text-sm: 0.75rem;      /* 12px */
+  --text-base: 0.875rem;   /* 14px */
+  --text-lg: 1rem;         /* 16px */
+  --text-xl: 1.25rem;      /* 20px */
+  --text-2xl: 1.5rem;      /* 24px */
+  --text-3xl: 1.875rem;    /* 30px */
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-black: 900;
+
+  --line-height-tight: 1.15;
+  --line-height-normal: 1.4;
+  --line-height-relaxed: 1.6;
+
+  /* Spacing Scale */
+  --space-0-5: 0.125rem;   /* 2px */
+  --space-1: 0.25rem;      /* 4px */
+  --space-1-5: 0.375rem;   /* 6px */
+  --space-2: 0.5rem;       /* 8px */
+  --space-2-5: 0.625rem;   /* 10px */
+  --space-3: 0.75rem;      /* 12px */
+  --space-4: 1rem;         /* 16px */
+  --space-5: 1.25rem;      /* 20px */
+  --space-6: 1.5rem;       /* 24px */
+  --space-8: 2rem;         /* 32px */
+  --space-10: 2.5rem;      /* 40px */
+  --space-12: 3rem;        /* 48px */
+
+  /* Radii */
+  --radius-xs: 0.25rem;    /* 4px */
+  --radius-sm: 0.375rem;   /* 6px */
+  --radius-md: 0.5rem;     /* 8px */
+  --radius-lg: 0.75rem;    /* 12px */
+  --radius-xl: 1rem;       /* 16px */
+  --radius-full: 9999px;
+
+  /* Elevation & Glow Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6), 0 4px 6px -4px rgba(0, 0, 0, 0.6);
+  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+
+  --shadow-glow-valorant: 0 0 25px rgba(var(--color-primitive-valorant-red-rgb), 0.25);
+  --shadow-glow-spotify: 0 0 25px rgba(var(--color-primitive-spotify-green-rgb), 0.25);
+  --shadow-badge-valorant: 0 0 15px rgba(var(--color-primitive-valorant-red-rgb), 0.5);
+  --shadow-badge-spotify: 0 0 15px rgba(var(--color-primitive-spotify-green-rgb), 0.5);
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Component Sizing Dimensions */
+  --size-titlebar-height: 2.5rem; /* 40px */
+  --size-badge-lg: 3.5rem;        /* 56px */
+  --size-badge-md: 2.25rem;       /* 36px */
+  --size-badge-sm: 1.25rem;       /* 20px */
+  --size-btn-icon: 1.75rem;       /* 28px */
 }
+
+/* ==========================================================================
+   CSS Modern Reset & Base Rules
+   ========================================================================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background-color: var(--color-bg-base);
+  color: var(--color-text-main);
+  font-family: var(--font-family-sans);
+  line-height: var(--line-height-normal);
+  user-select: none;
+  -webkit-user-select: none;
+  overflow: hidden;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+}
+
+input, button, textarea, select {
+  font: inherit;
+}
+
+/* ==========================================================================
+   Electron Frameless Drag Regions
+   ========================================================================== */
 
 .drag-region {
   -webkit-app-region: drag;
@@ -18,27 +170,33 @@
   -webkit-app-region: no-drag;
 }
 
-/* Custom modern range slider styling */
+/* ==========================================================================
+   Custom Modern Range Slider Styling
+   ========================================================================== */
+
 input[type='range'] {
   -webkit-appearance: none;
+  appearance: none;
   background: transparent;
+  width: 100%;
 }
 
 input[type='range']::-webkit-slider-runnable-track {
-  height: 8px;
-  border-radius: 9999px;
-  background: #1b2733;
+  height: 0.5rem;
+  border-radius: var(--radius-full);
+  background-color: var(--color-bg-surface-elevated);
 }
 
 input[type='range']::-webkit-slider-thumb {
   -webkit-appearance: none;
-  height: 20px;
-  width: 20px;
-  border-radius: 50%;
-  margin-top: -6px;
+  appearance: none;
+  height: 1.25rem;
+  width: 1.25rem;
+  border-radius: var(--radius-full);
+  margin-top: -0.375rem;
   cursor: pointer;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 input[type='range']::-webkit-slider-thumb:hover {
@@ -47,31 +205,33 @@ input[type='range']::-webkit-slider-thumb:hover {
 
 /* Valorant Slider Thumb */
 .slider-valorant::-webkit-slider-thumb {
-  background: #ff4655;
-  box-shadow: 0 0 12px rgba(255, 70, 85, 0.6);
+  background-color: var(--color-primary);
+  box-shadow: 0 0 12px rgba(var(--color-primary-rgb), 0.6);
 }
 
 /* Spotify Slider Thumb */
 .slider-spotify::-webkit-slider-thumb {
-  background: #1db954;
-  box-shadow: 0 0 12px rgba(29, 185, 84, 0.6);
+  background-color: var(--color-success);
+  box-shadow: 0 0 12px rgba(var(--color-success-rgb), 0.6);
 }
 
-/* Custom scrollbar */
+/* ==========================================================================
+   Custom Minimalist Scrollbar
+   ========================================================================== */
+
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 0.375rem;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0f1923;
+  background-color: var(--color-bg-base);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1b2733;
-  border-radius: 3px;
+  background-color: var(--color-bg-surface-elevated);
+  border-radius: var(--radius-xs);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #2c3e50;
+  background-color: var(--color-border-focus);
 }
-
