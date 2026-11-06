@@ -6,7 +6,7 @@ import { HotkeyConfig } from './components/HotkeyConfig'
 import { SpotifyAuth } from './components/SpotifyAuth'
 import { ProcessStatus } from './components/ProcessStatus'
 import { AppSettings, AudioMode, ValorantStatus, SpotifyAuthStatus, AudioSessionInfo } from './types'
-import { ShieldCheck, Info, AlertTriangle } from 'lucide-react'
+import { ShieldCheck, AlertTriangle } from 'lucide-react'
 
 export const App: React.FC = () => {
   const [settings, setSettings] = useState<AppSettings | null>(null)
@@ -113,24 +113,24 @@ export const App: React.FC = () => {
 
   if (!settings) {
     return (
-      <div className="h-screen w-screen bg-valorant-dark flex items-center justify-center text-gray-400">
+      <div className="h-screen w-screen bg-theme-base flex items-center justify-center text-theme-text-muted">
         Loading SpikeDrop...
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col h-screen bg-[#0f1923] text-valorant-text selection:bg-valorant-red selection:text-white">
+    <div className="flex flex-col h-screen bg-theme-base text-theme-text-main selection:bg-theme-primary selection:text-white">
       <TitleBar />
 
       <main className="flex-1 overflow-y-auto p-4 space-y-4">
         {window.api?.isElectron === false && (
-          <div className="bg-amber-500/10 border border-amber-500/40 rounded-xl p-3 flex items-start gap-3 text-amber-300 text-xs shadow-lg">
+          <div className="bg-amber-500/10 border border-amber-500/40 rounded-xl p-3 flex items-start gap-3 text-amber-300 text-sm shadow-lg">
             <AlertTriangle className="w-5 h-5 flex-shrink-0 text-amber-400 mt-0.5" />
             <div>
               <div className="font-bold text-amber-200">You are viewing SpikeDrop inside a Web Browser / VS Code Preview</div>
-              <p className="text-gray-300 mt-1 leading-relaxed">
-                SpikeDrop is a <strong>Windows desktop application</strong>. Operating system features (Valorant Windows mixer control, global fullscreen <kbd className="px-1.5 py-0.5 bg-[#1b2733] border border-gray-700 rounded text-gray-200 font-mono font-bold">F8</kbd> hotkey, and Spotify integration) run in the <strong>standalone SpikeDrop desktop window</strong>.
+              <p className="text-theme-text-body mt-1 leading-relaxed">
+                SpikeDrop is a <strong>Windows desktop application</strong>. Operating system features (Valorant Windows mixer control, global fullscreen <kbd className="px-1.5 py-0.5 bg-theme-surface-elevated border border-theme-border-focus rounded text-theme-text-body font-mono font-bold">F8</kbd> hotkey, and Spotify integration) run in the <strong>standalone SpikeDrop desktop window</strong>.
               </p>
               <p className="text-amber-400 font-semibold mt-1">
                 👉 Switch to the SpikeDrop window on your Windows Taskbar or system tray!
@@ -174,20 +174,20 @@ export const App: React.FC = () => {
         />
 
         {/* Bottom Preferences & Vanguard Info */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 pb-4 text-xs text-gray-400 border-t border-[#1b2733]">
-          <div className="flex items-center gap-2 text-[11px] text-gray-500">
-            <ShieldCheck className="w-4 h-4 text-spotify-green" />
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 pb-4 text-sm text-theme-text-muted border-t border-theme-border-subtle">
+          <div className="flex items-center gap-2 text-xs text-theme-text-dim">
+            <ShieldCheck className="w-4 h-4 text-theme-success" />
             <span>
               100% Vanguard Safe: Adjusts Windows Volume Mixer (WASAPI) with zero game memory injection.
             </span>
           </div>
 
-          <label className="flex items-center gap-2 cursor-pointer text-gray-400 hover:text-white">
+          <label className="flex items-center gap-2 cursor-pointer text-theme-text-muted hover:text-white">
             <input
               type="checkbox"
               checked={settings.minimizeToTray}
               onChange={(e) => handleUpdateSettings({ minimizeToTray: e.target.checked })}
-              className="rounded accent-valorant-red"
+              className="rounded accent-[var(--color-primitive-valorant-red)]"
             />
             <span>Minimize to System Tray on close</span>
           </label>
@@ -197,4 +197,3 @@ export const App: React.FC = () => {
   )
 }
 export default App
-
