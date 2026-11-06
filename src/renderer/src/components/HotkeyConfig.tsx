@@ -10,7 +10,6 @@ const PRESET_HOTKEYS = ['F8', 'Alt+\\', 'F7', 'F9', 'F10', 'Ctrl+Shift+S', 'Alt+
 
 export const HotkeyConfig: React.FC<HotkeyConfigProps> = ({ hotkey, onUpdateHotkey }) => {
   const [isRecording, setIsRecording] = useState(false)
-  const [currentKeys, setCurrentKeys] = useState<string[]>([])
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
@@ -64,32 +63,32 @@ export const HotkeyConfig: React.FC<HotkeyConfigProps> = ({ hotkey, onUpdateHotk
   }
 
   return (
-    <div className="bg-[#131d27] border border-[#1f2e3d] rounded-xl p-4">
+    <div className="bg-theme-surface border border-theme-border-default rounded-xl p-4">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <Keyboard className="w-4 h-4 text-valorant-red" />
-          <h3 className="text-sm font-bold text-white tracking-wide uppercase">
+          <Keyboard className="w-4 h-4 text-theme-primary" />
+          <h3 className="text-base font-bold text-white tracking-wide uppercase">
             Global Hotkey
           </h3>
         </div>
-        <span className="text-[10px] text-gray-400">Works in Fullscreen Game</span>
+        <span className="text-2xs text-theme-text-muted">Works in Fullscreen Game</span>
       </div>
 
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
         <div className="flex items-center gap-2 w-full sm:w-auto">
           {isRecording ? (
-            <div className="flex items-center gap-2 px-4 py-2 bg-valorant-red/10 border border-valorant-red text-valorant-red rounded-lg font-mono text-sm animate-pulse">
+            <div className="flex items-center gap-2 px-4 py-2 bg-theme-primary/10 border border-theme-primary text-theme-primary rounded-lg font-mono text-base animate-pulse">
               <span>Press any key combination...</span>
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <span className="px-4 py-2 bg-[#0e161e] border border-[#1f2e3d] rounded-lg font-mono text-base font-bold text-white shadow-inner">
+              <span className="px-4 py-2 bg-theme-inset border border-theme-border-default rounded-lg font-mono text-lg font-bold text-white shadow-inner">
                 {hotkey}
               </span>
               <button
                 type="button"
                 onClick={() => setIsRecording(true)}
-                className="px-3 py-2 bg-[#1b2733] hover:bg-[#253648] text-xs font-semibold rounded-lg text-gray-200 transition-colors"
+                className="px-3 py-2 bg-theme-surface-elevated hover:bg-theme-surface-hover text-sm font-semibold rounded-lg text-theme-text-body transition-colors"
               >
                 Record Keybind
               </button>
@@ -97,7 +96,7 @@ export const HotkeyConfig: React.FC<HotkeyConfigProps> = ({ hotkey, onUpdateHotk
           )}
 
           {saveSuccess && (
-            <div className="flex items-center gap-1 text-xs text-spotify-green">
+            <div className="flex items-center gap-1 text-sm text-theme-success">
               <Check className="w-4 h-4" />
               <span>Saved!</span>
             </div>
@@ -106,15 +105,16 @@ export const HotkeyConfig: React.FC<HotkeyConfigProps> = ({ hotkey, onUpdateHotk
 
         {/* Quick presets */}
         <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="text-xs text-gray-500 mr-1">Presets:</span>
+          <span className="text-sm text-theme-text-dim mr-1">Presets:</span>
           {PRESET_HOTKEYS.map((preset) => (
             <button
               key={preset}
+              type="button"
               onClick={() => handleSave(preset)}
-              className={`px-2 py-1 text-xs font-mono rounded transition-colors ${
+              className={`px-2 py-1 text-sm font-mono rounded transition-colors ${
                 hotkey === preset
-                  ? 'bg-valorant-red text-white font-bold'
-                  : 'bg-[#0e161e] hover:bg-[#1a2836] text-gray-400 hover:text-white border border-[#1f2e3d]'
+                  ? 'bg-theme-primary text-white font-bold'
+                  : 'bg-theme-inset hover:bg-theme-surface-elevated text-theme-text-muted hover:text-white border border-theme-border-default'
               }`}
             >
               {preset}
@@ -124,7 +124,7 @@ export const HotkeyConfig: React.FC<HotkeyConfigProps> = ({ hotkey, onUpdateHotk
       </div>
 
       {errorMsg && (
-        <div className="mt-2 text-xs text-valorant-red flex items-center gap-1">
+        <div className="mt-2 text-sm text-theme-primary flex items-center gap-1">
           <AlertCircle className="w-3.5 h-3.5" />
           <span>{errorMsg}</span>
         </div>
@@ -132,4 +132,3 @@ export const HotkeyConfig: React.FC<HotkeyConfigProps> = ({ hotkey, onUpdateHotk
     </div>
   )
 }
-
