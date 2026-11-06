@@ -22,15 +22,15 @@ export const VolumeSliders: React.FC<VolumeSlidersProps> = ({ settings, onUpdate
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {/* Valorant Audio Levels */}
-      <div className="bg-[#131d27] border border-[#1f2e3d] rounded-xl p-4 flex flex-col justify-between">
+      <div className="bg-theme-surface border border-theme-border-default rounded-xl p-4 flex flex-col justify-between">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Shield className="w-4 h-4 text-valorant-red" />
-            <h3 className="text-sm font-bold text-white tracking-wide uppercase">
+            <Shield className="w-4 h-4 text-theme-primary" />
+            <h3 className="text-base font-bold text-white tracking-wide uppercase">
               Valorant Volume
             </h3>
           </div>
-          <span className="text-[10px] uppercase font-mono text-gray-500 bg-[#0b1219] px-2 py-0.5 rounded">
+          <span className="text-2xs uppercase font-mono text-theme-text-dim bg-theme-header px-2 py-0.5 rounded">
             WASAPI Session
           </span>
         </div>
@@ -38,12 +38,12 @@ export const VolumeSliders: React.FC<VolumeSlidersProps> = ({ settings, onUpdate
         <div className="space-y-4">
           {/* Chill Mode Volume Slider */}
           <div>
-            <div className="flex justify-between items-center text-xs mb-1.5">
-              <span className="text-gray-300 flex items-center gap-1.5 font-medium">
-                <Volume2 className="w-3.5 h-3.5 text-gray-400" />
+            <div className="flex justify-between items-center text-sm mb-1.5">
+              <span className="text-theme-text-body flex items-center gap-1.5 font-medium">
+                <Volume2 className="w-3.5 h-3.5 text-theme-text-muted" />
                 Chill Mode (Target Volume)
               </span>
-              <span className="font-mono font-bold text-valorant-red">
+              <span className="font-mono font-bold text-theme-primary">
                 {Math.round(settings.valorantChillVolume * 100)}%
               </span>
             </div>
@@ -58,7 +58,7 @@ export const VolumeSliders: React.FC<VolumeSlidersProps> = ({ settings, onUpdate
               }
               className="w-full slider-valorant"
             />
-            <div className="flex justify-between text-[10px] text-gray-500 mt-1 font-mono">
+            <div className="flex justify-between text-2xs text-theme-text-dim mt-1 font-mono">
               <span>0% (Mute)</span>
               <span>20%</span>
               <span>40%</span>
@@ -67,12 +67,12 @@ export const VolumeSliders: React.FC<VolumeSlidersProps> = ({ settings, onUpdate
 
           {/* Gaming Mode Volume Slider */}
           <div>
-            <div className="flex justify-between items-center text-xs mb-1.5">
-              <span className="text-gray-300 flex items-center gap-1.5 font-medium">
-                <Volume2 className="w-3.5 h-3.5 text-valorant-red" />
+            <div className="flex justify-between items-center text-sm mb-1.5">
+              <span className="text-theme-text-body flex items-center gap-1.5 font-medium">
+                <Volume2 className="w-3.5 h-3.5 text-theme-primary" />
                 Gaming Mode (Focus Volume)
               </span>
-              <span className="font-mono font-bold text-valorant-red">
+              <span className="font-mono font-bold text-theme-primary">
                 {Math.round(settings.valorantGamingVolume * 100)}%
               </span>
             </div>
@@ -87,7 +87,7 @@ export const VolumeSliders: React.FC<VolumeSlidersProps> = ({ settings, onUpdate
               }
               className="w-full slider-valorant"
             />
-            <div className="flex justify-between text-[10px] text-gray-500 mt-1 font-mono">
+            <div className="flex justify-between text-2xs text-theme-text-dim mt-1 font-mono">
               <span>50%</span>
               <span>75%</span>
               <span>100%</span>
@@ -95,29 +95,30 @@ export const VolumeSliders: React.FC<VolumeSlidersProps> = ({ settings, onUpdate
           </div>
         </div>
 
-        <div className="mt-4 pt-3 border-t border-[#1f2e3d] flex items-center justify-between">
-          <span className="text-[11px] text-gray-400">Apply instantly to mixer</span>
+        <div className="mt-4 pt-3 border-t border-theme-border-default flex items-center justify-between">
+          <span className="text-xs text-theme-text-muted">Apply instantly to mixer</span>
           <button
+            type="button"
             onClick={() => handleTestValorant(settings.valorantChillVolume)}
             disabled={testingValorant}
-            className="px-2.5 py-1 rounded bg-[#1b2733] hover:bg-[#253648] text-xs text-gray-300 hover:text-white transition-colors flex items-center gap-1.5"
+            className="px-2.5 py-1 rounded bg-theme-surface-elevated hover:bg-theme-surface-hover text-sm text-theme-text-body hover:text-white transition-colors flex items-center gap-1.5"
           >
-            <Play className="w-3 h-3 text-valorant-red" />
+            <Play className="w-3 h-3 text-theme-primary" />
             <span>{testingValorant ? 'Testing...' : 'Test Chill Level'}</span>
           </button>
         </div>
       </div>
 
       {/* Spotify Audio Levels */}
-      <div className="bg-[#131d27] border border-[#1f2e3d] rounded-xl p-4 flex flex-col justify-between">
+      <div className="bg-theme-surface border border-theme-border-default rounded-xl p-4 flex flex-col justify-between">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Music className="w-4 h-4 text-spotify-green" />
-            <h3 className="text-sm font-bold text-white tracking-wide uppercase">
+            <Music className="w-4 h-4 text-theme-success" />
+            <h3 className="text-base font-bold text-white tracking-wide uppercase">
               Spotify Volume
             </h3>
           </div>
-          <span className="text-[10px] uppercase font-mono text-gray-500 bg-[#0b1219] px-2 py-0.5 rounded">
+          <span className="text-2xs uppercase font-mono text-theme-text-dim bg-theme-header px-2 py-0.5 rounded">
             Web Player API
           </span>
         </div>
@@ -125,12 +126,12 @@ export const VolumeSliders: React.FC<VolumeSlidersProps> = ({ settings, onUpdate
         <div className="space-y-4">
           {/* Chill Mode Music Volume */}
           <div>
-            <div className="flex justify-between items-center text-xs mb-1.5">
-              <span className="text-gray-300 flex items-center gap-1.5 font-medium">
-                <Volume2 className="w-3.5 h-3.5 text-spotify-green" />
+            <div className="flex justify-between items-center text-sm mb-1.5">
+              <span className="text-theme-text-body flex items-center gap-1.5 font-medium">
+                <Volume2 className="w-3.5 h-3.5 text-theme-success" />
                 Chill Mode (Target Volume)
               </span>
-              <span className="font-mono font-bold text-spotify-green">
+              <span className="font-mono font-bold text-theme-success">
                 {settings.spotifyChillVolume}%
               </span>
             </div>
@@ -145,7 +146,7 @@ export const VolumeSliders: React.FC<VolumeSlidersProps> = ({ settings, onUpdate
               }
               className="w-full slider-spotify"
             />
-            <div className="flex justify-between text-[10px] text-gray-500 mt-1 font-mono">
+            <div className="flex justify-between text-2xs text-theme-text-dim mt-1 font-mono">
               <span>30%</span>
               <span>65%</span>
               <span>100%</span>
@@ -153,27 +154,27 @@ export const VolumeSliders: React.FC<VolumeSlidersProps> = ({ settings, onUpdate
           </div>
 
           {/* Gaming Mode Playback Option */}
-          <div className="bg-[#0e161e] p-2.5 rounded-lg border border-[#1a2835] space-y-2">
+          <div className="bg-theme-inset p-2.5 rounded-lg border border-theme-border-default space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-xs text-gray-300 flex items-center gap-2 cursor-pointer">
+              <label className="text-sm text-theme-text-body flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={settings.pauseSpotifyInGaming}
                   onChange={(e) => onUpdate({ pauseSpotifyInGaming: e.target.checked })}
-                  className="rounded border-gray-600 text-spotify-green focus:ring-0 focus:outline-none accent-spotify-green"
+                  className="rounded border-theme-border-focus text-theme-success focus:ring-0 focus:outline-none accent-[var(--color-primitive-spotify-green)]"
                 />
                 <span className="font-medium">Pause playback in Gaming Mode</span>
               </label>
-              <VolumeX className="w-3.5 h-3.5 text-gray-500" />
+              <VolumeX className="w-3.5 h-3.5 text-theme-text-dim" />
             </div>
 
             <div className="flex items-center justify-between">
-              <label className="text-xs text-gray-300 flex items-center gap-2 cursor-pointer">
+              <label className="text-sm text-theme-text-body flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={settings.resumeSpotifyInChill}
                   onChange={(e) => onUpdate({ resumeSpotifyInChill: e.target.checked })}
-                  className="rounded border-gray-600 text-spotify-green focus:ring-0 focus:outline-none accent-spotify-green"
+                  className="rounded border-theme-border-focus text-theme-success focus:ring-0 focus:outline-none accent-[var(--color-primitive-spotify-green)]"
                 />
                 <span className="font-medium">Auto-resume playback in Chill Mode</span>
               </label>
@@ -181,11 +182,10 @@ export const VolumeSliders: React.FC<VolumeSlidersProps> = ({ settings, onUpdate
           </div>
         </div>
 
-        <div className="mt-4 pt-3 border-t border-[#1f2e3d] flex items-center justify-between">
-          <span className="text-[11px] text-gray-400">Controls active Spotify player</span>
+        <div className="mt-4 pt-3 border-t border-theme-border-default flex items-center justify-between">
+          <span className="text-xs text-theme-text-muted">Controls active Spotify player</span>
         </div>
       </div>
     </div>
   )
 }
-
