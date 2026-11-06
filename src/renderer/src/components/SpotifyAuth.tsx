@@ -40,30 +40,31 @@ export const SpotifyAuth: React.FC<SpotifyAuthProps> = ({
   }
 
   return (
-    <div className="bg-[#131d27] border border-[#1f2e3d] rounded-xl p-4">
+    <div className="bg-theme-surface border border-theme-border-default rounded-xl p-4">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <Music className="w-4 h-4 text-spotify-green" />
-          <h3 className="text-sm font-bold text-white tracking-wide uppercase">
+          <Music className="w-4 h-4 text-theme-success" />
+          <h3 className="text-base font-bold text-white tracking-wide uppercase">
             Spotify Integration
           </h3>
         </div>
 
         <button
+          type="button"
           onClick={onRefreshStatus}
           title="Refresh Spotify connection status"
-          className="text-gray-400 hover:text-white transition-colors"
+          className="text-theme-text-muted hover:text-white transition-colors"
         >
           <RefreshCw className="w-3.5 h-3.5" />
         </button>
       </div>
 
       <div className="flex flex-col gap-3">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#0e161e] p-3 rounded-lg border border-[#1a2835]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-theme-inset p-3 rounded-lg border border-theme-border-default">
           <div className="flex items-center gap-3">
             <div
               className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                status.isConnected ? 'bg-spotify-green/20 text-spotify-green' : 'bg-gray-800 text-gray-500'
+                status.isConnected ? 'bg-theme-success/20 text-theme-success' : 'bg-theme-surface-elevated text-theme-text-dim'
               }`}
             >
               {status.isConnected ? (
@@ -75,16 +76,16 @@ export const SpotifyAuth: React.FC<SpotifyAuthProps> = ({
 
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-white">
+                <span className="text-sm font-semibold text-white">
                   {status.isConnected ? status.displayName : 'Not Connected'}
                 </span>
                 {status.isConnected && (
-                  <span className="text-[10px] bg-spotify-green/20 text-spotify-green px-1.5 py-0.2 rounded font-mono uppercase">
+                  <span className="text-2xs bg-theme-success/20 text-theme-success px-1.5 py-0.2 rounded font-mono uppercase">
                     {status.product || 'Active'}
                   </span>
                 )}
               </div>
-              <p className="text-[11px] text-gray-400">
+              <p className="text-xs text-theme-text-muted">
                 {status.isConnected
                   ? status.hasActiveDevice
                     ? 'Spotify running on PC • Ready to toggle with F8'
@@ -97,16 +98,18 @@ export const SpotifyAuth: React.FC<SpotifyAuthProps> = ({
           <div className="flex items-center gap-2">
             {status.isConnected ? (
               <button
+                type="button"
                 onClick={onDisconnect}
-                className="px-3 py-1.5 rounded bg-red-900/30 hover:bg-red-900/50 text-red-400 border border-red-800/40 text-xs font-semibold transition-colors"
+                className="px-3 py-1.5 rounded bg-theme-danger/20 hover:bg-theme-danger/30 text-theme-primary border border-theme-danger/40 text-sm font-semibold transition-colors"
               >
                 Disconnect
               </button>
             ) : (
               <button
+                type="button"
                 onClick={handleConnect}
                 disabled={isConnecting}
-                className="px-4 py-2 rounded bg-spotify-green hover:bg-spotify-hover text-black text-xs font-bold tracking-wide transition-all shadow-[0_0_10px_rgba(29,185,84,0.3)] disabled:opacity-50"
+                className="px-4 py-2 rounded bg-theme-success hover:bg-theme-success-hover text-black text-sm font-bold tracking-wide transition-all shadow-glow-spotify disabled:opacity-50"
               >
                 {isConnecting ? 'Waiting in Browser...' : 'Connect Spotify'}
               </button>
@@ -115,15 +118,16 @@ export const SpotifyAuth: React.FC<SpotifyAuthProps> = ({
         </div>
 
         {/* Client ID Configuration Section */}
-        <div className="text-xs">
-          <div className="flex items-center justify-between text-gray-400 mb-1">
+        <div className="text-sm">
+          <div className="flex items-center justify-between text-theme-text-muted mb-1">
             <span className="flex items-center gap-1.5 font-medium">
               <Key className="w-3.5 h-3.5" />
               Spotify Client ID (Developer App)
             </span>
             <button
+              type="button"
               onClick={() => setEditingClientId(!editingClientId)}
-              className="text-[11px] text-valorant-red hover:underline"
+              className="text-xs text-theme-primary hover:underline"
             >
               {editingClientId ? 'Done' : 'Change Client ID'}
             </button>
@@ -136,20 +140,21 @@ export const SpotifyAuth: React.FC<SpotifyAuthProps> = ({
                 placeholder="Enter Spotify Client ID..."
                 value={localClientId}
                 onChange={(e) => setLocalClientId(e.target.value)}
-                className="flex-1 bg-[#0b1219] border border-[#2a3d52] rounded px-3 py-1.5 text-xs text-white focus:outline-none focus:border-spotify-green font-mono"
+                className="flex-1 bg-theme-header border border-theme-border-focus rounded px-3 py-1.5 text-sm text-white focus:outline-none focus:border-theme-success font-mono"
               />
               <button
+                type="button"
                 onClick={() => {
                   onUpdateClientId(localClientId)
                   setEditingClientId(false)
                 }}
-                className="px-3 py-1.5 bg-[#1b2733] hover:bg-[#253648] text-xs font-semibold rounded text-white"
+                className="px-3 py-1.5 bg-theme-surface-elevated hover:bg-theme-surface-hover text-sm font-semibold rounded text-white"
               >
                 Save
               </button>
             </div>
           ) : (
-            <div className="flex items-center justify-between text-[11px] text-gray-500 font-mono bg-[#0b1219] px-2.5 py-1.5 rounded border border-[#1b2733]">
+            <div className="flex items-center justify-between text-xs text-theme-text-dim font-mono bg-theme-header px-2.5 py-1.5 rounded border border-theme-border-subtle">
               <span>
                 {clientId
                   ? `${clientId.substring(0, 8)}••••••••••••••••${clientId.substring(clientId.length - 4)}`
@@ -159,7 +164,7 @@ export const SpotifyAuth: React.FC<SpotifyAuthProps> = ({
                 href="https://developer.spotify.com/dashboard"
                 target="_blank"
                 rel="noreferrer"
-                className="text-gray-400 hover:text-spotify-green flex items-center gap-1 font-sans"
+                className="text-theme-text-muted hover:text-theme-success flex items-center gap-1 font-sans"
               >
                 <span>Get one free</span>
                 <ExternalLink className="w-3 h-3" />
@@ -167,17 +172,16 @@ export const SpotifyAuth: React.FC<SpotifyAuthProps> = ({
             </div>
           )}
 
-          <p className="text-[10px] text-gray-500 mt-1">
+          <p className="text-2xs text-theme-text-dim mt-1">
             Redirect URI required in Spotify Dashboard:{' '}
-            <code className="text-gray-300 font-mono bg-[#0b1219] px-1 py-0.5 rounded">
+            <code className="text-theme-text-body font-mono bg-theme-header px-1 py-0.5 rounded">
               http://127.0.0.1:8888/callback
             </code>
           </p>
         </div>
 
-        {errorMsg && <p className="text-xs text-valorant-red mt-1">{errorMsg}</p>}
+        {errorMsg && <p className="text-sm text-theme-primary mt-1">{errorMsg}</p>}
       </div>
     </div>
   )
 }
-
