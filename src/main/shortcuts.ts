@@ -75,10 +75,9 @@ export class ShortcutManager {
       this.currentMode = 'GAMING'
       await Promise.allSettled([
         windowsAudio.setProcessVolume(settings.valorantProcessName, settings.valorantGamingVolume),
-        settings.spotifyGamingVolume > 0
-          ? spotifyController.setSpotifyVolume(settings.spotifyGamingVolume)
-          : Promise.resolve(false),
-        settings.pauseSpotifyInGaming ? spotifyController.setSpotifyPlayback(false) : Promise.resolve(false)
+        settings.pauseSpotifyInGaming
+          ? spotifyController.setSpotifyPlayback(false)
+          : spotifyController.setSpotifyVolume(settings.spotifyGamingVolume)
       ])
     }
 

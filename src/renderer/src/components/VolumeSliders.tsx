@@ -169,7 +169,7 @@ export const VolumeSliders = memo(function VolumeSliders({
 
           <div className="space-y-4">
             <VolumeSliderItem
-              label="Chill Mode (Target Volume)"
+              label="Chill Mode (Music Boost Volume)"
               valuePercent={settings.spotifyChillVolume}
               min={30}
               max={100}
@@ -180,6 +180,21 @@ export const VolumeSliders = memo(function VolumeSliders({
               icon={<Volume2 className="w-3.5 h-3.5 text-theme-success" />}
               onChange={(val) => onUpdate({ spotifyChillVolume: val })}
             />
+
+            {!settings.pauseSpotifyInGaming && (
+              <VolumeSliderItem
+                label="Gaming Mode (Background Music Volume)"
+                valuePercent={settings.spotifyGamingVolume ?? 15}
+                min={0}
+                max={40}
+                accent="spotify"
+                minLabel="0% (Quiet)"
+                midLabel="20%"
+                maxLabel="40%"
+                icon={<Volume2 className="w-3.5 h-3.5 text-theme-text-muted" />}
+                onChange={(val) => onUpdate({ spotifyGamingVolume: val })}
+              />
+            )}
 
             {/* Playback Automation Preferences */}
             <div className="bg-theme-inset p-2.5 rounded-lg border border-theme-border-default space-y-2">

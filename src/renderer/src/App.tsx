@@ -73,6 +73,8 @@ export const App = memo(function App() {
         <ModeIndicator
           mode={mode}
           hotkey={settings.hotkey}
+          spotifyGamingVolume={settings.spotifyGamingVolume}
+          pauseSpotifyInGaming={settings.pauseSpotifyInGaming}
           onToggle={() => void toggleMode()}
           isToggling={isToggling}
         />

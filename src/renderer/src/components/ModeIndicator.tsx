@@ -6,6 +6,8 @@ import { cn } from '../lib/utils'
 export interface ModeIndicatorProps {
   mode: AudioMode
   hotkey: string
+  spotifyGamingVolume?: number
+  pauseSpotifyInGaming?: boolean
   onToggle: () => void
   isToggling?: boolean
 }
@@ -13,6 +15,8 @@ export interface ModeIndicatorProps {
 export const ModeIndicator = memo(function ModeIndicator({
   mode,
   hotkey,
+  spotifyGamingVolume = 15,
+  pauseSpotifyInGaming = false,
   onToggle,
   isToggling = false
 }: ModeIndicatorProps) {
@@ -89,7 +93,9 @@ export const ModeIndicator = memo(function ModeIndicator({
 
             <p className="text-sm text-theme-text-muted mt-0.5">
               {isGaming
-                ? 'Valorant at 100% volume • Spotify playback paused'
+                ? pauseSpotifyInGaming
+                  ? 'Valorant at 100% volume • Spotify playback paused'
+                  : `Valorant at 100% volume • Spotify lowered to ${spotifyGamingVolume}%`
                 : 'Valorant lowered to 10% • Spotify playing at boost level'}
             </p>
           </div>
