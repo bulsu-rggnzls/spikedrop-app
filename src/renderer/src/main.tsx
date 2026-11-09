@@ -63,6 +63,7 @@ if (typeof window !== 'undefined' && !window.api) {
     disconnectSpotify: async () => true,
     onSpotifyStatusChanged: () => () => {},
     testValorantVolume: async () => false,
+    testSpotifyVolume: async () => false,
     minimizeWindow: () => {},
     maximizeWindow: () => {},
     closeWindow: () => {}
