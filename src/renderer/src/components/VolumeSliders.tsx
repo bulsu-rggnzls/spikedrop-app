@@ -19,6 +19,8 @@ interface VolumeSliderItemProps {
   midLabel: string
   maxLabel: string
   icon?: React.ReactNode
+  disabled?: boolean
+  customValueLabel?: string
   onChange: (newPercent: number) => void
 }
 
@@ -33,12 +35,14 @@ const VolumeSliderItem = memo(function VolumeSliderItem({
   midLabel,
   maxLabel,
   icon,
+  disabled = false,
+  customValueLabel,
   onChange
 }: VolumeSliderItemProps) {
   const isValorant = accent === 'valorant'
 
   return (
-    <div>
+    <div className={cn(disabled && 'opacity-40 transition-opacity')}>
       <div className="flex justify-between items-center text-sm mb-1.5">
         <span className="text-theme-text-body flex items-center gap-1.5 font-medium">
           {icon}
@@ -47,10 +51,14 @@ const VolumeSliderItem = memo(function VolumeSliderItem({
         <span
           className={cn(
             'font-mono font-bold',
-            isValorant ? 'text-theme-primary' : 'text-theme-success'
+            disabled
+              ? 'text-theme-text-dim italic'
+              : isValorant
+                ? 'text-theme-primary'
+                : 'text-theme-success'
           )}
         >
-          {valuePercent}%
+          {customValueLabel ?? `${valuePercent}%`}
         </span>
       </div>
 
@@ -60,6 +68,7 @@ const VolumeSliderItem = memo(function VolumeSliderItem({
         max={max}
         step={step}
         value={valuePercent}
+        disabled={disabled}
         aria-label={label}
         aria-valuemin={min}
         aria-valuemax={max}
@@ -82,6 +91,7 @@ export const VolumeSliders = memo(function VolumeSliders({
   onUpdate
 }: VolumeSlidersProps) {
   const [testingValorant, setTestingValorant] = useState(false)
+  const [testingSpotify, setTestingSpotify] = useState<'gaming' | 'chill' | null>(null)
 
   const handleTestValorant = useCallback(async (vol: number) => {
     setTestingValorant(true)
@@ -89,6 +99,15 @@ export const VolumeSliders = memo(function VolumeSliders({
       await window.api.testValorantVolume(Math.round(vol * 100))
     } finally {
       setTimeout(() => setTestingValorant(false), 800)
+    }
+  }, [])
+
+  const handleTestSpotify = useCallback(async (vol: number, type: 'gaming' | 'chill') => {
+    setTestingSpotify(type)
+    try {
+      await window.api.testSpotifyVolume(vol)
+    } finally {
+      setTimeout(() => setTestingSpotify(null), 800)
     }
   }, [])
 
@@ -163,7 +182,7 @@ export const VolumeSliders = memo(function VolumeSliders({
               </h3>
             </div>
             <span className="text-2xs uppercase font-mono text-theme-text-dim bg-theme-header px-2 py-0.5 rounded">
-              Web Player API
+              Web Player API & Mixer
             </span>
           </div>
 
@@ -181,20 +200,24 @@ export const VolumeSliders = memo(function VolumeSliders({
               onChange={(val) => onUpdate({ spotifyChillVolume: val })}
             />
 
-            {!settings.pauseSpotifyInGaming && (
-              <VolumeSliderItem
-                label="Gaming Mode (Background Music Volume)"
-                valuePercent={settings.spotifyGamingVolume ?? 15}
-                min={0}
-                max={40}
-                accent="spotify"
-                minLabel="0% (Quiet)"
-                midLabel="20%"
-                maxLabel="40%"
-                icon={<Volume2 className="w-3.5 h-3.5 text-theme-text-muted" />}
-                onChange={(val) => onUpdate({ spotifyGamingVolume: val })}
-              />
-            )}
+            <VolumeSliderItem
+              label={
+                settings.pauseSpotifyInGaming
+                  ? 'Gaming Mode (Background Volume - Paused)'
+                  : 'Gaming Mode (Background Volume)'
+              }
+              valuePercent={settings.spotifyGamingVolume ?? 15}
+              min={0}
+              max={60}
+              accent="spotify"
+              minLabel="0% (Quiet)"
+              midLabel="30%"
+              maxLabel="60%"
+              disabled={settings.pauseSpotifyInGaming}
+              customValueLabel={settings.pauseSpotifyInGaming ? 'Paused' : undefined}
+              icon={<Volume2 className="w-3.5 h-3.5 text-theme-text-muted" />}
+              onChange={(val) => onUpdate({ spotifyGamingVolume: val })}
+            />
 
             {/* Playback Automation Preferences */}
             <div className="bg-theme-inset p-2.5 rounded-lg border border-theme-border-default space-y-2">
@@ -206,7 +229,7 @@ export const VolumeSliders = memo(function VolumeSliders({
                     onChange={(e) => onUpdate({ pauseSpotifyInGaming: e.target.checked })}
                     className="rounded border-theme-border-focus text-theme-success focus:ring-0 focus:outline-none accent-[var(--color-primitive-spotify-green)]"
                   />
-                  <span className="font-medium">Pause playback in Gaming Mode</span>
+                  <span className="font-medium">Pause music in Gaming Mode (instead of lowering volume)</span>
                 </label>
                 <VolumeX className="w-3.5 h-3.5 text-theme-text-dim" aria-hidden="true" />
               </div>
@@ -227,7 +250,29 @@ export const VolumeSliders = memo(function VolumeSliders({
         </div>
 
         <div className="mt-4 pt-3 border-t border-theme-border-default flex items-center justify-between">
-          <span className="text-xs text-theme-text-muted">Controls active Spotify player</span>
+          <span className="text-xs text-theme-text-muted">In-game volume switch</span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => void handleTestSpotify(settings.spotifyGamingVolume ?? 15, 'gaming')}
+              disabled={testingSpotify !== null || settings.pauseSpotifyInGaming}
+              className="px-2 py-1 rounded bg-theme-surface-elevated hover:bg-theme-surface-hover text-xs text-theme-text-body hover:text-white transition-colors flex items-center gap-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-theme-success disabled:opacity-40"
+              title="Test Spotify volume at Gaming background level"
+            >
+              <Play className="w-3 h-3 text-theme-success" aria-hidden="true" />
+              <span>{testingSpotify === 'gaming' ? 'Testing...' : 'Test Gaming Vol'}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => void handleTestSpotify(settings.spotifyChillVolume, 'chill')}
+              disabled={testingSpotify !== null}
+              className="px-2 py-1 rounded bg-theme-surface-elevated hover:bg-theme-surface-hover text-xs text-theme-text-body hover:text-white transition-colors flex items-center gap-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-theme-success disabled:opacity-40"
+              title="Test Spotify volume at Chill boost level"
+            >
+              <Play className="w-3 h-3 text-theme-success" aria-hidden="true" />
+              <span>{testingSpotify === 'chill' ? 'Testing...' : 'Test Chill Vol'}</span>
+            </button>
+          </div>
         </div>
       </section>
     </div>
