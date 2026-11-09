@@ -203,6 +203,10 @@ function registerIpcHandlers(): void {
     return await windowsAudio.setProcessVolume(settings.valorantProcessName, volumePercent / 100)
   })
 
+  ipcMain.handle('test-spotify-volume', async (_event, volumePercent: number) => {
+    return await spotifyController.setSpotifyVolume(volumePercent)
+  })
+
   // Window control IPCs
   ipcMain.on('window-minimize', () => {
     mainWindow?.minimize()
