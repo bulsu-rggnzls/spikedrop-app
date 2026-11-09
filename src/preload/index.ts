@@ -68,6 +68,8 @@ const api = {
 
   testValorantVolume: (volumePercent: number): Promise<boolean> =>
     ipcRenderer.invoke('test-valorant-volume', volumePercent),
+  testSpotifyVolume: (volumePercent: number): Promise<boolean> =>
+    ipcRenderer.invoke('test-spotify-volume', volumePercent),
 
   minimizeWindow: (): void => ipcRenderer.send('window-minimize'),
   maximizeWindow: (): void => ipcRenderer.send('window-maximize'),
